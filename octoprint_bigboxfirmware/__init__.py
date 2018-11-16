@@ -12,6 +12,7 @@ from subprocess import call, Popen, PIPE
 import threading
 import time
 import re
+import shutil
 
 class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
                            octoprint.plugin.TemplatePlugin,
@@ -21,7 +22,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
                            octoprint.plugin.StartupPlugin):
     
     def __init__(self):
-        self.templates = ('Configuration.h', 'Configuration_adv.h', 'pins_RUMBA.h')
+        self.templates = ('Configuration.h', 'Configuration_adv.h', 'pins_RUMBA.h','BigBoxCustomisations.h')
         self.depList = ['avr-libc', 'avrdude', 'make']
         self.depInstalled = False
         
@@ -81,6 +82,11 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         
         #TODO: Temporary fix to be able to use RC6 and RC7 source. Need to get this done properly by the makefile
         self.execute(['make', '-j4', '-f', makeFilePath, 'BUILD_DIR=' + buildFolder, 'ARDUINO_LIB_DIR=' + arduinoLibPath], cwd=marlinFolder)
+        #TODO: Copy hex file for backup  
+        datetime_var=time.strftime("%Y%m%d-%H%M%S")
+        dst_file=r'/home/pi/firmware/Marlin.{}.hex'.format(datetime_var)
+        shutil.copyfile(hexPath,dst_file)
+        self._sendStatus(line='Copying hex file to: ' + dst_file, stream='message')
   
         
         if os.path.exists(hexPath):
@@ -722,46 +728,46 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         
                      
     
-	##~~ SettingsPlugin mixin
+    ##~~ SettingsPlugin mixin
 
     def get_settings_defaults(self):
         return dict(
-			# put your plugin's default settings here
-		)
+            # put your plugin's default settings here
+        )
 
-	##~~ AssetPlugin mixin
+    ##~~ AssetPlugin mixin
     
     def get_assets(self):
-		# Define your plugin's asset files to automatically include in the
-		# core UI here.
-		return dict(
-			js=["js/bigboxfirmware.js"],
-			css=["css/bigboxfirmware.css"],
-			less=["less/bigboxfirmware.less"]
-		)
+        # Define your plugin's asset files to automatically include in the
+        # core UI here.
+        return dict(
+            js=["js/bigboxfirmware.js"],
+            css=["css/bigboxfirmware.css"],
+            less=["less/bigboxfirmware.less"]
+        )
 
-	##~~ Softwareupdate hook
+    ##~~ Softwareupdate hook
     
     def get_update_information(self):
-		# Define the configuration for your plugin to use with the Software Update
-		# Plugin here. See https://github.com/foosel/OctoPrint/wiki/Plugin:-Software-Update
-		# for details.
-		return dict(
-			bigboxfirmware=dict(
-				displayName="BigBox Firmware Flasher",
-				displayVersion=self._plugin_version,
+        # Define the configuration for your plugin to use with the Software Update
+        # Plugin here. See https://github.com/foosel/OctoPrint/wiki/Plugin:-Software-Update
+        # for details.
+        return dict(
+            bigboxfirmware=dict(
+                displayName="BigBox Firmware Flasher",
+                displayVersion=self._plugin_version,
 
-				# version check: github repository
-				type="github_commit",
-				user="tohara",
-				repo="OctoPrint-BigBoxFirmware",
+                # version check: github repository
+                type="github_commit",
+                user="tohara",
+                repo="OctoPrint-BigBoxFirmware",
                 #branch="dev",
-				current=self._plugin_version,
+                current=self._plugin_version,
 
-				# update method: pip
-				pip="https://github.com/tohara/OctoPrint-BigBoxFirmware/archive/{target_version}.zip"
-			)
-		)
+                # update method: pip
+                pip="https://github.com/tohara/OctoPrint-BigBoxFirmware/archive/{target_version}.zip"
+            )
+        )
         
     def route_hook(self, server_routes, *args, **kwargs):
         from octoprint.server.util.tornado import LargeResponseHandler
@@ -791,13 +797,13 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
 __plugin_name__ = "BigBoxFirmware"
 
 def __plugin_load__():
-	global __plugin_implementation__
-	__plugin_implementation__ = BigBoxFirmwarePlugin()
+    global __plugin_implementation__
+    __plugin_implementation__ = BigBoxFirmwarePlugin()
     
 
-	global __plugin_hooks__
-	__plugin_hooks__ = {
-		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
+    global __plugin_hooks__
+    __plugin_hooks__ = {
+        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
         "octoprint.server.http.routes": __plugin_implementation__.route_hook
-	}
+    }
 

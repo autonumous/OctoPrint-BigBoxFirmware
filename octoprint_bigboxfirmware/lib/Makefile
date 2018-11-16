@@ -120,6 +120,15 @@ SRC += $(notdir $(wildcard $(ARDUINO_LIB_DIR)/libraries/U8glib/utility/*.c))
 #CXXSRC += LiquidCrystal.cpp
 
 CXXSRC = $(wildcard *.cpp)
+#CXXSRC = WMath.cpp WString.cpp Print.cpp Marlin_main.cpp \
+#    MarlinSerial.cpp Sd2Card.cpp SdBaseFile.cpp SdFatUtil.cpp \
+#    SdFile.cpp SdVolume.cpp planner.cpp stepper.cpp \
+#    temperature.cpp cardreader.cpp configuration_store.cpp \
+#    watchdog.cpp SPI.cpp servo.cpp Tone.cpp ultralcd.cpp digipot_mcp4451.cpp \
+#    dac_mcp4728.cpp vector_3.cpp least_squares_fit.cpp endstops.cpp stopwatch.cpp utility.cpp \
+#    printcounter.cpp nozzle.cpp serial.cpp gcode.cpp Max7219_Debug_LEDs.cpp
+
+
 
 CXXSRC += LiquidCrystal.cpp WMath.cpp WString.cpp Print.cpp
 
@@ -180,7 +189,7 @@ ifneq ($(HARDWARE_MOTHERBOARD),)
 CTUNING += -DMOTHERBOARD=${HARDWARE_MOTHERBOARD}
 endif
 #CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
-CEXTRA = -fno-use-cxa-atexit -fno-threadsafe-statics
+CEXTRA = -fno-use-cxa-atexit -fno-threadsafe-statics #-fpermissive
 
 CFLAGS := $(CDEBUG) $(CDEFS) $(CINCS) -O$(OPT) $(CWARN) $(CSTANDARD) $(CEXTRA) $(CTUNING)
 CXXFLAGS :=         $(CDEFS) $(CINCS) -O$(OPT) -Wall    $(CXXSTANDARD) $(CEXTRA) $(CTUNING)
