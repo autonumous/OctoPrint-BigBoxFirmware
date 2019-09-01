@@ -696,8 +696,31 @@ $(function() {
         self._scrollWorkingOutputToEnd = function() {
             self.workingOutput.scrollTop(self.workingOutput[0].scrollHeight - self.workingOutput.height());
         };
-       
-         
+               
+        self.buildOnlyProfile = function(profile) {
+                if (!self.depInstalled()) { return;}
+                if (self.requestInProgress()) { return;}
+                //console.log('makeMarlin');
+                self.requestInProgress(true);
+                self._markWorking('Build Firmware', 'Starting......');
+
+
+            $.ajax({
+                url: PLUGIN_BASEURL + "bigboxfirmware/buildonly",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify({
+                    selected_port: self.connection.selectedPort(),
+                    profileId: profile.id
+                }),
+                contentType: "application/json; charset=UTF-8",
+                complete: function() {
+                        self._markDone();
+                        self.requestInProgress(false);
+                }
+            });
+        };
+
         self.flashProfile = function(profile) {
         	if (!self.depInstalled()) { return;}
         	if (self.requestInProgress()) { return;}

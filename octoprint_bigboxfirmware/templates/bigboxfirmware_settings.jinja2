@@ -22,6 +22,7 @@
         <td class="settings_plugin_bigboxfirmware_profiles_action">
           <i class="icon-spinner icon-spin" data-bind="visible: $root.requestInProgress()"></i>
           <a href="#" class="icon-download flash" title="Flash Firmware" data-bind="click: function() { $root.flashProfile($data); }, css: {disabled: $root.requestInProgress() || !$root.depInstalled()}, enabled: !$root.requestInProgress && $root.depInstalled">
+          </a>&nbsp;|&nbsp;<a href="#" class="icon-download flash" title="Build Firmware" data-bind="click: function() { $root.buildOnlyProfile($data); }, css: {disabled: $root.requestInProgress() || !$root.depInstalled()}, enabled: !$root.requestInProgress && $root.depInstalled">          
           </a>&nbsp;|&nbsp;<a href="#" class="icon-copy" title="Duplicate Profile" data-bind="click: function() { $root.duplicateProfile($data); }, css: {disabled: $root.requestInProgress()}, enabled: !$root.requestInProgress">
           </a>&nbsp;|&nbsp;<a href="#" class="icon-pencil" title="Edit Profile" data-bind="click: function() { $root.showEditProfileDialog($data); }, css: {disabled: $root.requestInProgress()}, enabled: !$root.requestInProgress">
           </a>&nbsp;|&nbsp;<a href="#" class="icon-trash" title="Delete Profile" data-bind="click: function() { $root.removeProfile($data); }, css: {disabled: $root.requestInProgress()}, enabled: !$root.requestInProgress">

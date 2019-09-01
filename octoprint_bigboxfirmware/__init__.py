@@ -58,7 +58,9 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         repoPath = self.getRepoNamePath(profile['url'])
         marlinFolder = repoPath + '/Marlin'
         
-        
+        datetime_var=time.strftime("%Y%m%d-%H%M%S")
+        profileName=profile['name'].replace(" ", "_")
+
         if self._printer.is_printing() or self._printer.is_paused():
             self._sendStatus(line='Printer is busy! Aborted Flashing!', stream='stderr')
             return flask.make_response("Error.", 500)
@@ -83,8 +85,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         #TODO: Temporary fix to be able to use RC6 and RC7 source. Need to get this done properly by the makefile
         self.execute(['make', '-j4', '-f', makeFilePath, 'BUILD_DIR=' + buildFolder, 'ARDUINO_LIB_DIR=' + arduinoLibPath], cwd=marlinFolder)
         #TODO: Copy hex file for backup  
-        datetime_var=time.strftime("%Y%m%d-%H%M%S")
-        dst_file=r'/home/pi/firmware/Marlin.{}.hex'.format(datetime_var)
+        dst_file=r'/home/pi/firmware/Marlin_{}.{}.hex'.format(profileName,datetime_var)
         shutil.copyfile(hexPath,dst_file)
         self._sendStatus(line='Copying hex file to: ' + dst_file, stream='message')
   
@@ -116,7 +117,64 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
 
  
         return flask.make_response("Ok.", 200)
-        
+    
+    @octoprint.plugin.BlueprintPlugin.route("/buildonly", methods=["POST"])
+    @octoprint.server.util.flask.restricted_access
+    @octoprint.server.admin_permission.require(403)
+    def make_marlinBuildOnly(self):
+
+        avrdudePath = '/usr/bin/avrdude'
+        selectedPort = flask.request.json['selected_port'] if flask.request.json.has_key('selected_port') else ''
+        profileId = flask.request.json['profileId']
+        dataFolder = self.get_plugin_data_folder()
+        buildFolder = dataFolder + '/tmp'
+        hexPath = buildFolder + '/Marlin.hex'
+        libPath = self._basefolder + '/lib'
+        arduinoLibPath = libPath + '/arduino-1.6.8'
+        makeFilePath = libPath + '/Makefile'
+
+        profile = self.getProfileFromId(profileId)
+        repoPath = self.getRepoNamePath(profile['url'])
+        marlinFolder = repoPath + '/Marlin'
+
+        datetime_var=time.strftime("%Y%m%d-%H%M%S")
+        profileName=profile['name'].replace(" ", "_")
+
+
+        if self._printer.is_printing() or self._printer.is_paused():
+            self._sendStatus(line='Printer is busy! Aborted Flashing!', stream='stderr')
+            return flask.make_response("Error.", 500)
+
+
+        self._sendStatus(line='Checking out selected branch...', stream='message')
+
+        self.execute(['git', 'checkout', '-f', profile['branch']], cwd= repoPath)
+
+        if profile['url'] in self.getAutoUpdateList():
+            self._sendStatus(line='Updating selected branch...', stream='message')
+            self.execute(['git', 'fetch'], cwd= repoPath)
+            self.execute(['git', 'reset', '--hard', 'origin/' + profile['branch']], cwd= repoPath)
+            self.addDefineLibEntry(profile['url'], profile['branch'])
+
+        self._sendStatus(line='Writing configuration..........', stream='message')
+
+        self.writeMarlinConfig(profile, marlinFolder)
+
+        self._sendStatus(line='Building Marlin................', stream='message')
+
+        #TODO: Temporary fix to be able to use RC6 and RC7 source. Need to get this done properly by the makefile
+        self.execute(['make', '-j4', '-f', makeFilePath, 'BUILD_DIR=' + buildFolder, 'ARDUINO_LIB_DIR=' + arduinoLibPath], cwd=marlinFolder)
+        #TODO: Copy hex file for backup
+        dst_file=r'/home/pi/firmware/Marlin_{}.{}.hex'.format(profileName,datetime_var)
+        shutil.copyfile(hexPath,dst_file)
+        self._sendStatus(line='Copying hex file to: ' + dst_file, stream='message')
+
+        self._sendStatus(line='Cleaning up build files....', stream='message')
+
+        self.execute(['make', 'clean', '-f', makeFilePath, 'BUILD_DIR=' + buildFolder, 'ARDUINO_LIB_DIR=' + arduinoLibPath], cwd=marlinFolder)
+
+        return flask.make_response("Ok.", 200)
+
     def getMakeDep(self, marlinFolder):
         #TODO: Temporary fix to be able to use RC6 and RC7 source. Need to get this done properly by the makefile
         depRC6 = 'WMath.cpp WString.cpp Print.cpp Marlin_main.cpp    \
