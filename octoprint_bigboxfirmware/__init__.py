@@ -22,7 +22,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
                            octoprint.plugin.StartupPlugin):
     
     def __init__(self):
-        self.templates = ('Configuration.h', 'Configuration_adv.h', 'pins_RUMBA.h','BigBoxCustomisations.h')
+        self.templates = ('Configuration.h', 'Configuration_adv.h', 'pins_RUMBA_BigBoxDual.h', 'BigBoxCustomisations.h')  #'pins_RUMBA.h' )
         self.depList = ['avr-libc', 'avrdude', 'make']
         self.depInstalled = False
         
@@ -111,6 +111,17 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         else:   
             self._sendStatus(line='Something went wrong. Hex file does not exist!', stream='stderr')
             
+        # 20190914 PB update copy config files
+        # Copy Config Files from marlinFolder to Firmware Folder
+        # make a dir in firmare folder called "profileName-datetime_var"
+        config_backup_dir=r'/home/pi/firmware/{}-{}/'.format(profileName,datetime_var)
+        self._sendStatus(line='Backing up config files to: '+config_backup_dir, stream='message')
+        if not os.path.exists(config_backup_dir):
+            os.mkdir(config_backup_dir)
+        shutil.copy2(dst_file,config_backup_dir)
+        for template in self.templates:
+            shutil.copy2(marlinFolder + '/' + template, config_backup_dir)
+
         self._sendStatus(line='Cleaning up build files....', stream='message')
              
         self.execute(['make', 'clean', '-f', makeFilePath, 'BUILD_DIR=' + buildFolder, 'ARDUINO_LIB_DIR=' + arduinoLibPath], cwd=marlinFolder)
@@ -169,6 +180,17 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         shutil.copyfile(hexPath,dst_file)
         self._sendStatus(line='Copying hex file to: ' + dst_file, stream='message')
 
+        # 20190914 PB update copy config files 
+        # Copy Config Files from marlinFolder to Firmware Folder
+        # make a dir in firmare folder called "profileName-datetime_var"
+        config_backup_dir=r'/home/pi/firmware/{}-{}/'.format(profileName,datetime_var)
+        self._sendStatus(line='Backing up config files to: '+config_backup_dir, stream='message')
+        if not os.path.exists(config_backup_dir):
+            os.mkdir(config_backup_dir)
+        shutil.copy2(dst_file,config_backup_dir)
+        for template in self.templates:
+            shutil.copy2(marlinFolder + '/' + template, config_backup_dir)
+            
         self._sendStatus(line='Cleaning up build files....', stream='message')
 
         self.execute(['make', 'clean', '-f', makeFilePath, 'BUILD_DIR=' + buildFolder, 'ARDUINO_LIB_DIR=' + arduinoLibPath], cwd=marlinFolder)
