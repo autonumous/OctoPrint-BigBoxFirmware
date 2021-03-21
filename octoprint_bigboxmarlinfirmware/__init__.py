@@ -17,7 +17,7 @@ import time
 import re
 import shutil
 
-class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
+class BigBoxMarlinFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
                            octoprint.plugin.TemplatePlugin,
                            octoprint.plugin.AssetPlugin,
                            octoprint.plugin.SettingsPlugin,
@@ -247,7 +247,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
                     for param in profile['define']:
                         if param['identifier'] == identifier:
                             enabled = '' if param['enabled'] else '//'
-                            targFile.write(enabled + '#define ' + param['identifier'] + ' ' + param['value'] + ' //Modified by BigBoxFirmware Plugin\n')
+                            targFile.write(enabled + '#define ' + param['identifier'] + ' ' + param['value'] + ' //Modified by BigBoxMarlinFirmware Plugin\n')
                             break
                     else:
                         targFile.write(line)
@@ -903,12 +903,12 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
-__plugin_name__ = "BigBoxFirmware"
+__plugin_name__ = "BigBoxMarlinFirmware"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = BigBoxFirmwarePlugin()
+    __plugin_implementation__ = BigBoxMarlinFirmwarePlugin()
     
 
     global __plugin_hooks__
