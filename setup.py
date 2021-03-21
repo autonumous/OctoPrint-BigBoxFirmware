@@ -4,30 +4,36 @@
 ### Do not forget to adjust the following variables to your own plugin.
 
 # The plugin's identifier, has to be unique
-plugin_identifier = "bigboxfirmware"
+#plugin_identifier = "bigboxfirmware"
+plugin_identifier = "bigboxmarlinfirmware"
 
 # The plugin's python package, should be "octoprint_<plugin identifier>", has to be unique
-plugin_package = "octoprint_bigboxfirmware"
+#plugin_package = "octoprint_bigboxfirmware"
+plugin_package = "octoprint_bigboxmarlinfirmware"
 
 # The plugin's human readable name. Can be overwritten within OctoPrint's internal data via __plugin_name__ in the
 # plugin module
-plugin_name = "OctoPrint-BigBoxFirmware"
+plugin_name = "OctoPrint-BigBoxMarlinFirmware"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "0.2.4"
+plugin_version = "0.3.0"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
-plugin_description = """Firmware configurator and flasher for BigBox"""
+plugin_description = """Marlin Firmware configurator and flasher for BigBox.  Originally created by Tom Haraldseid.  Hacked to make it work (ish) with Python3.  Currently for Marlin 1.1.x.  Plan to update to support later version of Octoprint (python 3.x). then Support Marlin 2.x, then other Marlin based Printers """
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
-plugin_author = "Tom Haraldseid"
+#plugin_author = "Tom Haraldseid"
+plugin_author = "autonumous"
 
 # The plugin's author's mail address.
-plugin_author_email = "tom.haraldseid@gmail.com"
+#plugin_author_email = "tom.haraldseid@gmail.com"
+plugin_author_email = "autonumous@icloud.com
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/tohara/OctoPrint-BigBoxFirmware"
+#plugin_url = "https://github.com/tohara/OctoPrint-BigBoxFirmware"
+plugin_url = "https://github.com/autonumous/OctoPrint-BigBoxMarlinFirmware"
+
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"

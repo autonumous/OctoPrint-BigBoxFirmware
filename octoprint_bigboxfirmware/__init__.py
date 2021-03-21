@@ -1,5 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import flask
 import json
 import os
@@ -22,15 +25,18 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
                            octoprint.plugin.StartupPlugin):
     
     def __init__(self):
+        print("BIGBOX FIRMWARE: __init__()")
         self.templates = ('Configuration.h', 'Configuration_adv.h', 'pins_RUMBA_BigBoxDual.h', 'BigBoxCustomisations.h')  #'pins_RUMBA.h' )
         self.depList = ['avr-libc', 'avrdude', 'make']
         self.depInstalled = False
         
     def on_startup(self, host, port):
+        print("BIGBOX FIRMWARE: on_startup()")
         self.depInstalled = self.check_dep()
         self.getDefLib()
                
     def on_after_startup(self):
+        print("BIGBOX FIRMWARE: on_after_startup()")
         dataFolder = self.get_plugin_data_folder()
         profileFolder = dataFolder + '/profiles'
         defaultProfileFolder = self._basefolder + '/default_profiles'
@@ -45,7 +51,8 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
     def make_marlin(self):
         
         avrdudePath = '/usr/bin/avrdude'
-        selectedPort = flask.request.json['selected_port'] if flask.request.json.has_key('selected_port') else ''
+        #selectedPort = flask.request.json['selected_port'] if flask.request.json.has_key('selected_port') else ''
+        selectedPort = flask.request.json['selected_port'] if 'selected_port' in flask.request.json else '' 
         profileId = flask.request.json['profileId']
         dataFolder = self.get_plugin_data_folder()
         buildFolder = dataFolder + '/tmp'
@@ -135,7 +142,8 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
     def make_marlinBuildOnly(self):
 
         avrdudePath = '/usr/bin/avrdude'
-        selectedPort = flask.request.json['selected_port'] if flask.request.json.has_key('selected_port') else ''
+        #selectedPort = flask.request.json['selected_port'] if flask.request.json.has_key('selected_port') else ''
+        selectedPort = flask.request.json['selected_port'] if 'selected_port' in flask.request.json else ''
         profileId = flask.request.json['profileId']
         dataFolder = self.get_plugin_data_folder()
         buildFolder = dataFolder + '/tmp'
@@ -254,7 +262,8 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
     def getProfileFromId(self, profileId):
         dataFolder = self.get_plugin_data_folder()
         profilePath = dataFolder + '/profiles/' + profileId
-        with open(profilePath, 'r+b') as f:
+        ##with open(profilePath, 'r+b') as f:
+        with open(profilePath, 'r+t') as f:
                 profile = eval(f.read())['profile']
                 
         return profile       
@@ -269,7 +278,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         def checkInstalled(package):
             res = Popen(['dpkg', '-s', package], stdout=PIPE)
             
-            return 'Status: install ok installed' in res.communicate()[0]
+            return 'Status: install ok installed' in res.communicate()[0].decode('ascii')
             
         isInstalled = True
         
@@ -303,12 +312,14 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         if not os.path.isdir(profile_folder):
             os.mkdir(profile_folder)
         
-        _,_,fileList = os.walk(profile_folder).next()
+        #_,_,fileList = os.walk(profile_folder).next()
+        _,_,fileList = next(os.walk(profile_folder))
         
         returnDict = {}
         
         for pFile in fileList:
-            with open(profile_folder +'/'+ pFile, 'r+b') as f:
+            ##with open(profile_folder +'/'+ pFile, 'r+b') as f:
+            with open(profile_folder +'/'+ pFile, 'r+t') as f:
                 profile = eval(f.read())['profile']
                 returnDict[profile['id']] = profile 
 
@@ -334,19 +345,22 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         defLibFile = settingsFolder + '/deflib'
         
         if os.path.isfile(defLibFile):            
-            with open(defLibFile, 'r+b') as f:
+           #with open(defLibFile, 'r+b') as f: 
+            with open(defLibFile, 'r+t') as f:
                 currentDefLib = eval(f.read())
         else:
             currentDefLib = {}
             
-        if currentDefLib.has_key('version'):
+        #if currentDefLib.has_key('version'):
+        if 'version' in currentDefLib:
             if currentDefLib['version'] == self._plugin_version:
                 return currentDefLib
             
         self.addAllRepoToDefLib()
             
         if os.path.isfile(defLibFile):            
-            with open(defLibFile, 'r+b') as f:
+            ##with open(defLibFile, 'r+b') as f:
+            with open(defLibFile, 'r+t') as f: 
                 currentDefLib = eval(f.read())
         else:
             currentDefLib = {}
@@ -360,6 +374,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
             os.remove(defLibFile)
             
         for repo in self.getRepos():
+            print(repo)
             self.addRepoToDefLib(repo['repoUrl'])
        
     def addRepoToDefLib(self, url):
@@ -379,7 +394,8 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         defLibFile = settingsFolder + '/deflib'
         
         if os.path.isfile(defLibFile):            
-            with open(defLibFile, 'r+b') as f:
+            ##with open(defLibFile, 'r+b') as f:
+            with open(defLibFile, 'r+t') as f:
                 currentDefLib = eval(f.read())
         else:
             return
@@ -387,7 +403,8 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         currentDefLib.pop(url, None)
         currentDefLib['values'].pop(url, None)
         
-        with open(defLibFile, 'w+b') as f:
+        #with open(defLibFile, 'w+b') as f:
+        with open(defLibFile, 'w+t') as f:    
             f.write(str(currentDefLib))
         
     def addDefineLibEntry(self, url, branch):
@@ -401,8 +418,9 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         
         defLibFile = settingsFolder + '/deflib'
         
-        if os.path.isfile(defLibFile):            
-            with open(defLibFile, 'r+b') as f:
+        if os.path.isfile(defLibFile):   
+            #with open(defLibFile, 'r+b') as f:         
+            with open(defLibFile, 'r+t') as f:
                 currentDefLib = eval(f.read())
         else:
             currentDefLib = {}
@@ -449,20 +467,28 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
             
             tempFile.close()
         
-        if not currentDefLib.has_key(url):
+        #if not currentDefLib.has_key(url):
+        if url not in currentDefLib: 
             currentDefLib[url] = {}
             
-        if not currentDefLib.has_key('values'):
+        #if not currentDefLib.has_key('values'):
+        if 'values' not in currentDefLib:
             currentDefLib['values'] = {}
             
-        if not currentDefLib['values'].has_key(url):
+        #if not currentDefLib['values'].has_key(url):
+        if url not in currentDefLib['values']: 
             currentDefLib['values'][url] = {}
             
         currentDefLib[url][branch] = defList
         currentDefLib['values'][url][branch] = defValList
         
-        with open(defLibFile, 'w+b') as f:
+        #with open(defLibFile, 'w+b') as f:
+        with open(defLibFile, 'w+t') as f:
+            print(type(currentDefLib))
+            print(currentDefLib)
+            print("-----")
             f.write(str(currentDefLib))
+            #f.write(currentDefLib)
     
     @octoprint.plugin.BlueprintPlugin.route("/firmwareprofiles", methods=["POST"])
     @octoprint.server.util.flask.restricted_access
@@ -476,7 +502,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
             
         profile_id = flask.request.json['profile']['id']
         
-        profile_file = open(profile_folder + '/' + profile_id, 'w+b')
+        profile_file = open(profile_folder + '/' + profile_id, 'w+t')
         
         profile_file.write(str(flask.request.json))
         profile_file.flush()
@@ -507,7 +533,8 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         uploadProfilePath = flask.request.values[inputUploadPath]
        
         try:
-            with open(uploadProfilePath, 'r+b') as f:
+            ##with open(uploadProfilePath, 'r+b') as f:
+            with open(uploadProfilePath, 'r+t') as f:    
                 profile = eval(f.read())['profile']
         except:
             return flask.make_response("Error.", 415)
@@ -539,7 +566,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
             
         profile_id = flask.request.json['profile']['id']
         
-        profile_file = open(profile_folder + '/' + profile_id, 'w+b')
+        profile_file = open(profile_folder + '/' + profile_id, 'w+t')
         
         profile_file.write(str(flask.request.json))
         profile_file.flush()
@@ -685,7 +712,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         retDict['branchList'] = []
         branchTrigger = False
         
-        for line in res.split('\n'):
+        for line in res.decode('ascii').split('\n'):
             if 'Fetch URL:' in line:
                 retDict['repoUrl'] = line.replace('Fetch URL:', '').strip()
             
@@ -834,18 +861,20 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         # for details.
         return dict(
             bigboxfirmware=dict(
-                displayName="BigBox Firmware Flasher",
+                displayName="BigBox Marlin Firmware Flasher",
                 displayVersion=self._plugin_version,
 
                 # version check: github repository
                 type="github_commit",
-                user="tohara",
-                repo="OctoPrint-BigBoxFirmware",
+                #user="tohara",
+                user="autonumous",
+                repo="OctoPrint-BigBoxMarlinFirmware",
                 #branch="dev",
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/tohara/OctoPrint-BigBoxFirmware/archive/{target_version}.zip"
+                #pip="https://github.com/tohara/OctoPrint-BigBoxFirmware/archive/{target_version}.zip"
+                pip="https://github.com/autonumous/OctoPrint-BigBoxMarlinFirmware/archive/{target_version}.zip"
             )
         )
         
@@ -875,6 +904,7 @@ class BigBoxFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
 __plugin_name__ = "BigBoxFirmware"
+__plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
     global __plugin_implementation__
