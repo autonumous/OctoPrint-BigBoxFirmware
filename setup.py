@@ -28,7 +28,7 @@ plugin_author = "autonumous"
 
 # The plugin's author's mail address.
 #plugin_author_email = "tom.haraldseid@gmail.com"
-plugin_author_email = "autonumous@icloud.com
+plugin_author_email = "autonumous@icloud.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
 #plugin_url = "https://github.com/tohara/OctoPrint-BigBoxFirmware"
