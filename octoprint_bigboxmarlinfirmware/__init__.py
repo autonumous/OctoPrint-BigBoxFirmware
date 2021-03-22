@@ -848,9 +848,9 @@ class BigBoxMarlinFirmwarePlugin(octoprint.plugin.BlueprintPlugin,
         # Define your plugin's asset files to automatically include in the
         # core UI here.
         return dict(
-            js=["js/bigboxfirmware.js"],
-            css=["css/bigboxfirmware.css"],
-            less=["less/bigboxfirmware.less"]
+            js=["js/bigboxmarlinfirmware.js"],
+            css=["css/bigboxmarlinirmware.css"],
+            less=["less/bigboxmarlinfirmware.less"]
         )
 
     ##~~ Softwareupdate hook

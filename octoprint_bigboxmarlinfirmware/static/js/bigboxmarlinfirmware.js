@@ -1,5 +1,5 @@
 /*
- * View model for OctoPrint-BigBoxFirmware
+ * View model for OctoPrint-BigBoxMarlinFirmware
  *
  * Author: Tom Haraldseid
  * License: AGPLv3
@@ -7,7 +7,7 @@
 
 
 $(function() {
-    function BigBoxFirmwareViewModel(parameters) {
+    function BigBoxMarlinFirmwareViewModel(parameters) {
         var self = this;
 
         self.settingsViewModel = parameters[0];
@@ -154,7 +154,7 @@ $(function() {
             var profile = self._editorData();
             self.requestInProgress(true);
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/firmwareprofiles",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/firmwareprofiles",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -180,7 +180,7 @@ $(function() {
         	
             self.requestInProgress(true);
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/firmwareprofiles/" + data.id,
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/firmwareprofiles/" + data.id,
                 type: "DELETE",
                 dataType: "json",
                 success: function() {
@@ -205,7 +205,7 @@ $(function() {
             self.requestInProgress(true);
 
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/firmwareprofiles/" + profile.id,
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/firmwareprofiles/" + profile.id,
                 type: "PATCH",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -230,7 +230,7 @@ $(function() {
         	self.requestInProgress(true);
         	items = [];
         	$.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/firmwareprofiles",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/firmwareprofiles",
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
@@ -252,7 +252,7 @@ $(function() {
         	self.requestInProgress(true);
         	items = [];
         	$.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/firmwarerepos",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/firmwarerepos",
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
@@ -350,14 +350,14 @@ $(function() {
             self.editorDefine(data.define.sort(self.defineSortFunc).map(self.defineCheckExist));
             
             
-            var editDialog = $("#settings_plugin_bigboxfirmware_editDialog");
+            var editDialog = $("#settings_plugin_bigboxmarlinfirmware_editDialog");
             var confirmButton = $("button.btn-confirm", editDialog);
             var dialogTitle = $("h3.modal-title", editDialog);
             
-            var profileImportFile = $("#settings_plugin_bigboxfirmware_profile_import", editDialog);
+            var profileImportFile = $("#settings_plugin_bigboxmarlinfirmware_profile_import", editDialog);
             
-            var sortAlphaButton = $("#plugin_bigboxfirmware_sort_alphabet");
-            var sortConfButton = $("#plugin_bigboxfirmware_sort_config");
+            var sortAlphaButton = $("#plugin_bigboxmarlinfirmware_sort_alphabet");
+            var sortConfButton = $("#plugin_bigboxmarlinfirmware_sort_config");
             
             sortAlphaButton.unbind("click");
             sortAlphaButton.bind("click", function() {
@@ -456,7 +456,7 @@ $(function() {
         
         self.confirmEditProfile = function(add) {
             var callback = function() {
-                $("#settings_plugin_bigboxfirmware_editDialog").modal("hide");
+                $("#settings_plugin_bigboxmarlinfirmware_editDialog").modal("hide");
             };
 
             if (add) {
@@ -500,10 +500,10 @@ $(function() {
         	self.editorDefineValueList.unshift({'identifier': 'Custom define', 'value': '', 'enabled': true });
         	
         	
-        	var defineValueDialog = $("#settings_plugin_bigboxfirmware_defineTemplateDialog");
+        	var defineValueDialog = $("#settings_plugin_bigboxmarlinfirmware_defineTemplateDialog");
             var confirmButton = $("button.btn-confirm", defineValueDialog);
             var dialogTitle = $("h3.modal-title", defineValueDialog);
-            var defineValueList = $("#settings_plugin_bigboxfirmware_defineTemplateDialog_defineList");
+            var defineValueList = $("#settings_plugin_bigboxmarlinfirmware_defineTemplateDialog_defineList");
             var confirmCallback = function() {
             	ko.utils.arrayPushAll(self.editorDefine,
             			self.editorDefineValueSelected().map(function(obj) {
@@ -542,7 +542,7 @@ $(function() {
             	return;
             }
         	
-            var repoDialog = $("#settings_plugin_bigboxfirmware_repoDialog");
+            var repoDialog = $("#settings_plugin_bigboxmarlinfirmware_repoDialog");
             var confirmButton = $("button.btn-confirm", repoDialog);
             var dialogTitle = $("h3.modal-title", repoDialog);
             
@@ -608,7 +608,7 @@ $(function() {
         	self._markWorking('Update GitHub Repositories', 'Updating: ' + repo.repoUrl);
         	
         	$.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/updateRepos/",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/updateRepos/",
                 type: "PATCH",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -634,14 +634,14 @@ $(function() {
         	self._markWorking('Update GitHub Repositories', 'Saving....');
         	
         	$.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/updateRepos/",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/updateRepos/",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
                 data: JSON.stringify({repoUrlList: self.repoEditorUrlList()}),
                 success: function() {
                     
-                    $("#settings_plugin_bigboxfirmware_repoDialog").modal("hide");
+                    $("#settings_plugin_bigboxmarlinfirmware_repoDialog").modal("hide");
                     self.requestRepoData();
                     
                     self._markDone();
@@ -663,8 +663,8 @@ $(function() {
         
         
         self.onStartup = function() {
-            self.workingDialog = $("#settings_plugin_bigboxfirmware_workingdialog");
-            self.workingOutput = $("#settings_plugin_bigboxfirmware_workingdialog_output");
+            self.workingDialog = $("#settings_plugin_bigboxmarlinfirmware_workingdialog");
+            self.workingOutput = $("#settings_plugin_bigboxmarlinfirmware_workingdialog_output");
             if (!self.depInstalled()) {
         		self.checkInstalledDep();
         	}
@@ -706,7 +706,7 @@ $(function() {
 
 
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/buildonly",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/buildonly",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({
@@ -730,7 +730,7 @@ $(function() {
      
 
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/make",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/make",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({
@@ -752,7 +752,7 @@ $(function() {
      
 
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/install",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/install",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -765,7 +765,7 @@ $(function() {
         };
         
         self.onDataUpdaterPluginMessage = function(plugin, data) {
-            if (plugin != "bigboxfirmware") {
+            if (plugin != "bigboxmarlinfirmware") {
                 return;
             }
             
@@ -790,7 +790,7 @@ $(function() {
         self.checkInstalledDep = function() {
            	
             $.ajax({
-                url: PLUGIN_BASEURL + "bigboxfirmware/check_dep",
+                url: PLUGIN_BASEURL + "bigboxmarlinfirmware/check_dep",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({
@@ -812,12 +812,12 @@ $(function() {
 
     // view model class, parameters for constructor, container to bind to
     OCTOPRINT_VIEWMODELS.push([
-        BigBoxFirmwareViewModel,
+        BigBoxMarlinFirmwareViewModel,
 
         // e.g. loginStateViewModel, settingsViewModel, ...
         ["settingsViewModel", "loginStateViewModel", "connectionViewModel", "printerStateViewModel"],
 
         // e.g. #settings_plugin_pidtune, #tab_plugin_pidtune, ...
-        "#settings_plugin_bigboxfirmware"
+        "#settings_plugin_bigboxmarlinfirmware"
     ]);
 });
